@@ -1,0 +1,86 @@
+<?php require base_path('views/partials/head.php'); ?>
+<?php require base_path('views/partials/auth_header.php'); ?>
+
+<main class="relative w-full px-8 pt-20 pb-16 min-h-dvh bg-background-950">
+    <div class="relative mx-auto w-full max-w-7xl py-8">
+        <!-- Encabezado -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-background-800 pb-4">
+            <div>
+                <h1 class="w-fit border-b py-1 text-3xl sm:text-4xl font-semibold text-text-50 border-b-accent-800">Clientes (Contacto)</h1>
+                <p class="mt-1 text-sm text-text-300">Clientes registrados desde el formulario público de contacto y reservas.</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="/auth/marketing" class="rounded-md px-4 py-2 text-sm font-medium bg-background-900 border border-background-800 text-text-100 hover:border-accent-600 transition-colors">
+                    Servicios
+                </a>
+                <a href="/auth/marketing/promociones" class="rounded-md px-4 py-2 text-sm font-medium bg-background-900 border border-background-800 text-text-100 hover:border-accent-600 transition-colors">
+                    Promociones
+                </a>
+            </div>
+        </div>
+
+        <!-- Barra de búsqueda y resumen -->
+        <div class="mt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <form action="/auth/marketing/clientes" method="GET" class="relative flex h-10 w-full max-w-md items-center">
+                <input name="search" type="text" class="rounded-r-none inp h-10 w-full" placeholder="Buscar por nombre, cédula o email..." value="<?= isset($_GET['search']) ? htmlspecialchars($_GET['search']) : '' ?>">
+                <button type="submit" class="grid aspect-square h-10 place-items-center rounded-r-md transition-colors duration-200 bg-secondary-800 hover:bg-secondary-700 active:bg-accent-500" title="Buscar">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5 fill-text-50">
+                        <path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <?php if (!empty($_GET['search'])): ?>
+                    <a href="/auth/marketing/clientes" class="ml-2 text-sm text-accent-400 hover:underline whitespace-nowrap">Limpiar</a>
+                <?php endif; ?>
+            </form>
+            <div class="text-sm text-text-200">
+                Total registrados: <span class="font-semibold text-text-50"><?= count($clientes) ?></span>
+            </div>
+        </div>
+
+        <!-- Tabla de clientes -->
+        <div class="mt-6 overflow-x-auto rounded-lg border border-background-800">
+            <table class="min-w-full divide-y divide-background-800">
+                <thead class="bg-background-900">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-text-200 uppercase">ID</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-text-200 uppercase">Cédula</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-text-200 uppercase">Nombre</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-text-200 uppercase">Teléfono</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-text-200 uppercase">Email</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-text-200 uppercase">Dirección</th>
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-text-200 uppercase">Estado</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-background-950 divide-y divide-background-900">
+                    <?php if (empty($clientes)): ?>
+                        <tr>
+                            <td colspan="7" class="px-4 py-8 text-center text-sm text-text-300">No hay clientes registrados.</td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($clientes as $cli): ?>
+                            <tr class="hover:bg-background-900 transition-colors">
+                                <td class="px-4 py-3 text-sm text-text-300">#<?= htmlspecialchars($cli['CLI_ID']) ?></td>
+                                <td class="px-4 py-3 text-sm text-text-50 font-mono"><?= htmlspecialchars($cli['CLI_CED']) ?></td>
+                                <td class="px-4 py-3 text-sm font-medium text-text-50"><?= htmlspecialchars($cli['CLI_NOM']) ?></td>
+                                <td class="px-4 py-3 text-sm text-text-100"><?= htmlspecialchars($cli['CLI__NUM'] ?? '—') ?></td>
+                                <td class="px-4 py-3 text-sm text-text-200"><?= htmlspecialchars($cli['CLI_EMAIL'] ?? '—') ?></td>
+                                <td class="px-4 py-3 text-sm text-text-200"><?= htmlspecialchars($cli['direccion'] ?? '—') ?></td>
+                                <td class="px-4 py-3 text-sm text-center">
+                                    <?php if ((int)$cli['EST_CLI_ID'] === 1): ?>
+                                        <span class="inline-flex items-center rounded-full bg-emerald-800/30 px-2.5 py-0.5 text-xs font-medium text-emerald-300">Primera Vez</span>
+                                    <?php else: ?>
+                                        <span class="inline-flex items-center rounded-full bg-secondary-800/40 px-2.5 py-0.5 text-xs font-medium text-text-100">Nuevo</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<?php require base_path('views/partials/routes_aside.php'); ?>
+<?php require base_path('views/partials/auth_footer.php'); ?>
+<?php require base_path('views/partials/end.php'); ?>

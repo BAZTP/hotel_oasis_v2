@@ -1,0 +1,38 @@
+<?php
+
+namespace Core;
+
+class Validator
+{
+	public static function string($value, $min = 1, $max = INF): bool
+	{
+		$value = trim($value);
+
+		return strlen($value) >= $min && strlen($value) <= $max;
+	}
+
+	public static function email(string $value): bool
+	{
+		return filter_var($value, FILTER_VALIDATE_EMAIL);
+	}
+
+	public static function phone(string $value): bool
+	{
+		return preg_match('/^\d{10}$/', $value);
+	}
+
+	public static function cedula(string $value): bool
+	{
+		return preg_match('/^\d{10}$/', $value);
+	}
+
+	public static function greaterThan(int $value, int $greaterThan): bool
+	{
+		return $value > $greaterThan;
+	}
+
+	public static function lessThan(int $value, int $lessThan): bool
+	{
+		return $value < $lessThan;
+	}
+}
