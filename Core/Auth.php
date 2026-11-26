@@ -22,7 +22,17 @@ class Auth
 
             if ($user) {
                 error_log("Usuario encontrado. Comparando contraseñas.");
-                if ($password === $user['USU_CON_HAS']) {
+                $isValidHash = password_verify($password, $user['USU_CON_HAS']);
+                $isLegacyPlain = !$isValidHash && password_get_info($user['USU_CON_HAS'])['algo'] === null && $password === $user['USU_CON_HAS'];
+
+                if ($isValidHash || $isLegacyPlain) {
+                    if ($isLegacyPlain) {
+                        $newHash = password_hash($password, PASSWORD_DEFAULT);
+                        $db->prepare("UPDATE seg_usuario SET USU_CON_HAS = :hash WHERE USU_ID = :id")
+                           ->bind(':hash', $newHash)
+                           ->bind(':id', $user['USU_ID'])
+                           ->execute();
+                    }
                     error_log("Contraseña correcta. Iniciando sesión.");
                     $this->login($user);
                     return true;
@@ -74,8 +84,7 @@ class Auth
         }
 
         $db = Database::getInstance();
-       // $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        $hashedPassword = $password;
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
         $query = "INSERT INTO seg_usuario (PERS_ID, USU_NOM, USU_CON_HAS, USU_ROL) VALUES (:persId, :email, :password, :role)";
 
@@ -190,7 +199,7 @@ public function updateUser($userId, $email, $role, $password = null): bool
             throw new \InvalidArgumentException("La contraseña debe tener al menos 3 caracteres.");
         }
         $query .= ", USU_CON_HAS = :password";
-        $params[':password'] = $password;
+        $params[':password'] = password_hash($password, PASSWORD_DEFAULT);
     }
 
     $query .= " WHERE USU_ID = :userId";

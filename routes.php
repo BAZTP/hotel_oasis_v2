@@ -133,6 +133,7 @@ $router->get('/auth/pdf', 'auth/fpdf.php')->middleware('personal');
 $router->get('/auth/clientes/search', 'auth/marketing/clientes/clientes.get.php')->middleware('marketing');
 $router->post('/auth/clientes/crear', 'auth/marketing/clientes/crear.post.php')->middleware('marketing');
 $router->get('/auth/marketing/clientes', 'auth/marketing/clientes/index.php')->middleware('marketing');
+$router->post('/auth/marketing/clientes/actualizar', 'auth/marketing/clientes/actualizar.php')->middleware('marketing');
 $router->get('/auth/marketing', 'auth/marketing/index.php')->middleware('marketing');
 $router->get('/auth/marketing/crear', 'auth/marketing/crear.php')->middleware('marketing');
 $router->post('/auth/marketing/crear', 'auth/marketing/crear.post.php')->middleware('marketing');

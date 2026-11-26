@@ -1,5 +1,6 @@
 <?php
 
+use Core\Auth;
 use Core\Database;
 use Core\DatabaseException;
 
@@ -117,6 +118,8 @@ try {
 
     // Confirmar la transacción
     $db->query("COMMIT");
+
+    Auth::logAction("Ingreso registrado (#$ingreso_id, {$attributes['nombre']}, \${$attributes['montoPagar']})");
 
     // Enviar respuesta de éxito
     echo json_encode([

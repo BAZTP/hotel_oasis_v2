@@ -49,12 +49,13 @@
                         <th class="px-4 py-3 text-left text-xs font-semibold text-text-200 uppercase">Email</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-text-200 uppercase">Dirección</th>
                         <th class="px-4 py-3 text-center text-xs font-semibold text-text-200 uppercase">Estado</th>
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-text-200 uppercase">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="bg-background-950 divide-y divide-background-900">
                     <?php if (empty($clientes)): ?>
                         <tr>
-                            <td colspan="7" class="px-4 py-8 text-center text-sm text-text-300">No hay clientes registrados.</td>
+                            <td colspan="8" class="px-4 py-8 text-center text-sm text-text-300">No hay clientes registrados.</td>
                         </tr>
                     <?php else: ?>
                         <?php foreach ($clientes as $cli): ?>
@@ -72,6 +73,13 @@
                                         <span class="inline-flex items-center rounded-full bg-secondary-800/40 px-2.5 py-0.5 text-xs font-medium text-text-100">Nuevo</span>
                                     <?php endif; ?>
                                 </td>
+                                <td class="px-4 py-3 text-center">
+                                    <button type="button" onclick='openEditClientModal(<?= htmlspecialchars(json_encode($cli), ENT_QUOTES, "UTF-8") ?>)' class="inline-flex items-center justify-center h-8 w-8 rounded-md bg-secondary-800 hover:bg-secondary-700 text-text-50 transition-colors" title="Editar cliente">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4">
+                                            <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
+                                        </svg>
+                                    </button>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -79,7 +87,64 @@
             </table>
         </div>
     </div>
+
+    <!-- Modal Editar Cliente -->
+    <div id="editClientModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+        <div class="w-full max-w-md rounded-xl border border-background-800 bg-background-900 shadow-xl overflow-hidden">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-background-800">
+                <h3 class="text-lg font-semibold text-text-50">Editar Cliente</h3>
+                <button type="button" onclick="closeEditClientModal()" class="text-text-300 hover:text-text-50">&times;</button>
+            </div>
+            <form method="POST" action="/auth/marketing/clientes/actualizar" class="p-6 space-y-4">
+                <input type="hidden" name="cli_id" id="edit_cli_id">
+                <div>
+                    <label class="block text-sm font-medium text-text-200 mb-1">Nombre</label>
+                    <input type="text" name="cli_nom" id="edit_cli_nom" class="w-full rounded-md bg-background-950 border border-background-800 px-3 py-2 text-text-50 text-sm" required>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium text-text-200 mb-1">Teléfono</label>
+                        <input type="text" name="cli_num" id="edit_cli_num" maxlength="10" class="w-full rounded-md bg-background-950 border border-background-800 px-3 py-2 text-text-50 text-sm" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-200 mb-1">Estado</label>
+                        <select name="est_cli_id" id="edit_est_cli_id" class="w-full rounded-md bg-background-950 border border-background-800 px-3 py-2 text-text-50 text-sm">
+                            <option value="1">Primera Vez</option>
+                            <option value="2">Nuevo</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-200 mb-1">Email</label>
+                    <input type="email" name="cli_email" id="edit_cli_email" class="w-full rounded-md bg-background-950 border border-background-800 px-3 py-2 text-text-50 text-sm" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-200 mb-1">Dirección</label>
+                    <input type="text" name="direccion" id="edit_direccion" class="w-full rounded-md bg-background-950 border border-background-800 px-3 py-2 text-text-50 text-sm">
+                </div>
+                <div class="pt-3 border-t border-background-800 flex justify-end gap-3">
+                    <button type="button" onclick="closeEditClientModal()" class="px-4 py-2 rounded-md text-sm font-medium bg-background-800 text-text-100 hover:bg-background-700">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 rounded-md text-sm font-medium bg-secondary-800 text-text-50 hover:bg-secondary-700">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </main>
+
+<script>
+function openEditClientModal(cli) {
+    document.getElementById('edit_cli_id').value = cli.CLI_ID;
+    document.getElementById('edit_cli_nom').value = cli.CLI_NOM || '';
+    document.getElementById('edit_cli_num').value = cli.CLI__NUM || '';
+    document.getElementById('edit_cli_email').value = cli.CLI_EMAIL || '';
+    document.getElementById('edit_direccion').value = cli.direccion || '';
+    document.getElementById('edit_est_cli_id').value = cli.EST_CLI_ID || 1;
+    document.getElementById('editClientModal').classList.remove('hidden');
+}
+function closeEditClientModal() {
+    document.getElementById('editClientModal').classList.add('hidden');
+}
+</script>
 
 <?php require base_path('views/partials/routes_aside.php'); ?>
 <?php require base_path('views/partials/auth_footer.php'); ?>
